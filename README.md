@@ -19,7 +19,7 @@ results = run_experiment(
     seeds=range(0, 10),
     days=365 * 4 + 1,
     ais=(
-        ('SupplyChainLabAI', remote_file('https://github.com/michalc/SupplyChainLabAI/archive/e4866cbdf3b3507433a09683005c0d6dcd983ae9.tar.gz')),
+        ('SupplyChainLabAI', (), remote_file('https://github.com/michalc/SupplyChainLabAI/archive/e4866cbdf3b3507433a09683005c0d6dcd983ae9.tar.gz')),
     ),
 )
 ```
