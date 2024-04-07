@@ -18,14 +18,10 @@ function SupplyChainLabAI::Start()
 
   local findTownsToConnect = function()
   {
-    /* Get a list of all towns on the map. */
+    // Connect the two towns with the highest population
     local townlist = AITownList();
-
-    /* Sort the list by population, highest population first. */
     townlist.Valuate(AITown.GetPopulation);
     townlist.Sort(AIList.SORT_BY_VALUE, false);
-
-    /* Pick the two towns with the highest population. */
     local townid_a = townlist.Begin();
     local townid_b = townlist.Next();
 
