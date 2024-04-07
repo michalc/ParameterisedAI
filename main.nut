@@ -32,7 +32,7 @@ function SupplyChainLabAI::Start()
     return [townid_a, townid_b];
   }
 
-  local findPathtoConnect = function(start, end)
+  local findPathToConnect = function(start, end)
   {
     /* Tell OpenTTD we want to build normal road (no tram tracks). */
     AIRoad.SetCurrentRoadType(AIRoad.ROADTYPE_ROAD);
@@ -60,7 +60,7 @@ function SupplyChainLabAI::Start()
   local townsToConnect = findTownsToConnect();
   AILog.Info("Going to connect " + AITown.GetName(townsToConnect[0]) + " to " + AITown.GetName(townsToConnect[1]));
 
-  local path = findPathtoConnect(AITown.GetLocation(townsToConnect[0]), AITown.GetLocation(townsToConnect[1])) 
+  local path = findPathToConnect(AITown.GetLocation(townsToConnect[0]), AITown.GetLocation(townsToConnect[1])) 
 
   if (path == null) {
     AILog.Error("No path found");
