@@ -1,3 +1,5 @@
+import("pathfinder.road", "RoadPathFinder", 4);
+
 class SupplyChainLabAI extends AIController 
 {
   function Start();
