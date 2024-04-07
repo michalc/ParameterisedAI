@@ -182,6 +182,9 @@ function SupplyChainLabAI::Start()
   AILog.Info("Have chosen bus " + AIEngine.GetName(busEngine));
 
   local busVehicle = AIVehicle.BuildVehicle(depotTile, busEngine);
+  AIOrder.AppendOrder(busVehicle, startStationTile, AIOrder.OF_NONE);
+  AIOrder.AppendOrder(busVehicle, endStationTile, AIOrder.OF_NONE);
+  AIVehicle.StartStopVehicle(busVehicle);
 
   while (true) {
     AILog.Info("Sleeping");
