@@ -42,7 +42,7 @@ function SupplyChainLabAI::Start()
 
     local path = false;
     while (path == false) {
-      AILog.Info("Finding... ")
+      AILog.Info("Finding path... ")
       path = pathfinder.FindPath(100);
       this.Sleep(1);
     }
