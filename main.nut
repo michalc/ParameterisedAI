@@ -105,3 +105,16 @@ function SupplyChainLabAI::Start()
     this.Sleep(50)
   }
 }
+
+ function SupplyChainLabAI::Save()
+ {
+   local table = {};  
+   //TODO: Add your save data to the table.
+   return table;
+ }
+ 
+ function SupplyChainLabAI::Load(version, data)
+ {
+   AILog.Info(" Loaded");
+   //TODO: Add your loading routines.
+ }
