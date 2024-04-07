@@ -6,13 +6,17 @@ class SupplyChainLabAI extends AIController
 
 function SupplyChainLabAI::Start()
 {
-  local i = 1
-  local name = "SupplyChainLabAI"
-  while (!AICompany.SetName(name)) {
-    name = "SupplyChainLabAI #" + ++i
+  local setName = function() {
+      local i = 1
+      local name = "SupplyChainLabAI"
+      while (!AICompany.SetName(name)) {
+        name = "SupplyChainLabAI #" + ++i
+      }
+
+      AILog.Info("Start of SupplyChainLabAI " + this.GetTick());
   }
 
-  AILog.Info("Start of SupplyChainLabAI " + this.GetTick());
+  setName();
 
   /* Get a list of all towns on the map. */
   local townlist = AITownList();
