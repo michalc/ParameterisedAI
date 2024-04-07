@@ -115,7 +115,7 @@ function SupplyChainLabAI::Start()
         if (built) {
           if (!AIRoad.BuildRoad(index, pathTileIndex)) {
           }
-          return;
+          return index;
         }
       }
     }
@@ -128,6 +128,14 @@ function SupplyChainLabAI::Start()
     }
     reversed.reverse();
     return reversed;
+  }
+
+  local getPassengerCargo = function() {
+    foreach (cargo, dummy in AICargoList()) {
+      if (AICargo.GetTownEffect(cargo) == AICargo.TE_PASSENGERS) {
+        return cargo;
+      }
+    }
   }
 
   local name = setName();
@@ -150,17 +158,30 @@ function SupplyChainLabAI::Start()
   local buildRoadStation = function(tile, front) {
     return AIRoad.BuildRoadStation(tile, front, AIRoad.ROADVEHTYPE_BUS, AIStation.STATION_NEW)
   }
-  buildAlong(getTiles(path), buildRoadStation)
+  local startStationTile = buildAlong(getTiles(path), buildRoadStation);
 
   // Build station as close as possible to the end of the path
   local reversedTiles = reverse(getTiles(path));
-  buildAlong(reversedTiles, buildRoadStation)
+  local endStationTile = buildAlong(reversedTiles, buildRoadStation);
 
   // Build depot as close as possible to the start of the path
   local buildRoadDepot = function(tile, front) {
     return AIRoad.BuildRoadDepot(tile, front);
   }
-  buildAlong(getTiles(path), buildRoadDepot)
+  local depotTile = buildAlong(getTiles(path), buildRoadDepot)
+
+  // Find bus type to build
+  local roadEngines = AIEngineList(AIVehicle.VT_ROAD);
+  roadEngines.Valuate(AIEngine.CanRefitCargo, getPassengerCargo());
+  roadEngines.KeepValue(1);
+  roadEngines.Valuate(AIEngine.IsBuildable);
+  roadEngines.KeepValue(1);
+  roadEngines.Valuate(AIEngine.GetMaxSpeed);
+  roadEngines.Sort(AIList.SORT_BY_VALUE, false);
+  local busEngine = roadEngines.Begin();
+  AILog.Info("Have chosen bus " + AIEngine.GetName(busEngine));
+
+  local busVehicle = AIVehicle.BuildVehicle(depotTile, busEngine);
 
   while (true) {
     AILog.Info("Sleeping");
