@@ -54,6 +54,14 @@ function SupplyChainLabAI::Start()
     return path
   }
 
+  local getTiles = function(path)
+  {
+    while (path != null) {
+      yield path.GetTile();
+      path = path.GetParent();
+    }
+  }
+
   local getTilePairs = function(path)
   {
     while (path != null) {
@@ -62,6 +70,39 @@ function SupplyChainLabAI::Start()
         yield [path.GetTile(), par.GetTile()];
       }
       path = par;
+    }
+  }
+
+  local buildRoad = function(tilePairs) {
+    local tileList = AITileList();
+    foreach (tilePair in tilePairs) {
+      local current = tilePair[0];
+      local next = tilePair[1];
+      tileList.AddTile(current);
+      if (AIMap.DistanceManhattan(current, next) == 1 ) {
+        if (!AIRoad.BuildRoad(current, next)) {
+          /* An error occured while building a piece of road. TODO: handle it.
+           * Note that is can also be the case that the road was already build. */
+        }
+      } else {
+        /* Build a bridge or tunnel. */
+        if (!AIBridge.IsBridgeTile(current) && !AITunnel.IsTunnelTile(current)) {
+          /* If it was a road tile, demolish it first. Do this to work around expended roadbits. */
+          if (AIRoad.IsRoadTile(current)) AITile.DemolishTile(current);
+          if (AITunnel.GetOtherTunnelEnd(current) == next) {
+            if (!AITunnel.BuildTunnel(AIVehicle.VT_ROAD, current)) {
+              /* An error occured while building a tunnel. TODO: handle it. */
+            }
+          } else {
+            local bridge_list = AIBridgeList_Length(AIMap.DistanceManhattan(current, next) + 1);
+            bridge_list.Valuate(AIBridge.GetMaxSpeed);
+            bridge_list.Sort(AIAbstractList.SORT_BY_VALUE, false);
+            if (!AIBridge.BuildBridge(AIVehicle.VT_ROAD, bridge_list.Begin(), current, next)) {
+              /* An error occured while building a bridge. TODO: handle it. */
+            }
+          }
+        }
+      }
     }
   }
 
@@ -78,42 +119,12 @@ function SupplyChainLabAI::Start()
   }
 
   /* If a path was found, build a road over it. */
-  local tileList = AITileList();
-  foreach (tilePair in getTilePairs(path)) {
-    local current = tilePair[0];
-    local next = tilePair[1];
-    tileList.AddTile(current);
-    if (AIMap.DistanceManhattan(current, next) == 1 ) {
-      if (!AIRoad.BuildRoad(current, next)) {
-        /* An error occured while building a piece of road. TODO: handle it.
-         * Note that is can also be the case that the road was already build. */
-      }
-    } else {
-      /* Build a bridge or tunnel. */
-      if (!AIBridge.IsBridgeTile(current) && !AITunnel.IsTunnelTile(current)) {
-        /* If it was a road tile, demolish it first. Do this to work around expended roadbits. */
-        if (AIRoad.IsRoadTile(current)) AITile.DemolishTile(current);
-        if (AITunnel.GetOtherTunnelEnd(current) == next) {
-          if (!AITunnel.BuildTunnel(AIVehicle.VT_ROAD, current)) {
-            /* An error occured while building a tunnel. TODO: handle it. */
-          }
-        } else {
-          local bridge_list = AIBridgeList_Length(AIMap.DistanceManhattan(current, next) + 1);
-          bridge_list.Valuate(AIBridge.GetMaxSpeed);
-          bridge_list.Sort(AIAbstractList.SORT_BY_VALUE, false);
-          if (!AIBridge.BuildBridge(AIVehicle.VT_ROAD, bridge_list.Begin(), current, next)) {
-            /* An error occured while building a bridge. TODO: handle it. */
-          }
-        }
-      }
-    }
-  }
-
+  buildRoad(getTilePairs(path));
   AILog.Info("Done");
 
   // Build as close as possible to the start of the path
   local built = false
-  foreach (pathTileIndex, value in tileList) {
+  foreach (pathTileIndex in getTiles(path)) {
     local adjacentTiles = AITileList();
     adjacentTiles.AddTile(pathTileIndex - AIMap.GetTileIndex(1,0));
     adjacentTiles.AddTile(pathTileIndex - AIMap.GetTileIndex(0,1));
