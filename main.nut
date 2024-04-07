@@ -38,12 +38,19 @@ function SupplyChainLabAI::Start()
   pathfinder.cost.turn = 5000;
 
   /* Give the source and goal tiles to the pathfinder. */
-  pathfinder.InitializePath([AITown.GetLocation(townid_a)], [AITown.GetLocation(townid_b)]);
+  local townlocation_a = AITown.GetLocation(townid_a);
+  local townlocation_b = AITown.GetLocation(townid_b);
+  pathfinder.InitializePath([townlocation_a], [townlocation_b]);
+
+  AILog.Info(
+    "From " + AIMap.GetTileX(townlocation_a) + "," + AIMap.GetTileY(townlocation_a) +
+    " to " +
+    AIMap.GetTileX(townlocation_b) + "," + AIMap.GetTileY(townlocation_b)
+  );
 
   /* Try to find a path. */
   local path = false;
   while (path == false) {
-
     AILog.Info("Finding... ")
     path = pathfinder.FindPath(100);
     this.Sleep(1);
