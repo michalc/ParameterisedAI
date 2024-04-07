@@ -32,3 +32,20 @@ results = run_experiment(
     ),
 )
 ```
+To then plot results [pandas](https://pandas.pydata.org/) and [Plotly express](https://plotly.com/python/plotly-express/) can be used.
+```python
+import pandas as pd
+import plotly.express as px
+
+df = pd.DataFrame(
+    {
+        'seed': row['seed'],
+        'date': row['date'],
+        'money': row['chunks']['PLYR']['0']['money'],
+    }
+    for row in results
+)
+df = df.pivot(index='date', columns='seed', values='money')
+fig = px.line(df)
+fig.show()
+```
