@@ -163,18 +163,6 @@ function SupplyChainLabAI::Start()
   buildAlong(getTiles(path), buildRoadDepot)
 
   while (true) {
-    while (AIEventController.IsEventWaiting()) {
-      local e = AIEventController.GetNextEvent();
-      AILog.Info("Got event" + e);
-
-      switch (e.GetEventType()) {
-        case AIEvent.ET_VEHICLE_CRASHED:
-          local ec = AIEventVehicleCrashed.Convert(e);
-          local v  = ec.GetVehicleID();
-          AILog.Info("We have a crashed vehicle (" + v + ")");
-          break;
-      }
-    }
     AILog.Info("Sleeping");
     this.Sleep(50)
   }
