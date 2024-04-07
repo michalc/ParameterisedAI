@@ -32,43 +32,38 @@ function SupplyChainLabAI::Start()
     return [townid_a, townid_b];
   }
 
+  local findPathtoConnect = function(start, end)
+  {
+    /* Tell OpenTTD we want to build normal road (no tram tracks). */
+    AIRoad.SetCurrentRoadType(AIRoad.ROADTYPE_ROAD);
+
+    /* Create an instance of the pathfinder. */
+    local pathfinder = RoadPathFinder();
+
+    /* Set the cost for making a turn extreme high. */
+    pathfinder.cost.turn = 5000;
+    pathfinder.InitializePath([start], [end]);
+
+    local path = false;
+    while (path == false) {
+      AILog.Info("Finding... ")
+      path = pathfinder.FindPath(100);
+      this.Sleep(1);
+    }
+
+    return path
+  }
+
   local name = setName();
   AILog.Info("Chosen company name: " + name);
 
   local townsToConnect = findTownsToConnect();
   AILog.Info("Going to connect " + AITown.GetName(townsToConnect[0]) + " to " + AITown.GetName(townsToConnect[1]));
 
-  /* Tell OpenTTD we want to build normal road (no tram tracks). */
-  AIRoad.SetCurrentRoadType(AIRoad.ROADTYPE_ROAD);
-
-  /* Create an instance of the pathfinder. */
-  local pathfinder = RoadPathFinder();
-
-  /* Set the cost for making a turn extreme high. */
-  pathfinder.cost.turn = 5000;
-
-  /* Give the source and goal tiles to the pathfinder. */
-  local townlocation_a = AITown.GetLocation(townsToConnect[0]);
-  local townlocation_b = AITown.GetLocation(townsToConnect[1]);
-  pathfinder.InitializePath([townlocation_a], [townlocation_b]);
-
-  AILog.Info(
-    "From " + AIMap.GetTileX(townlocation_a) + "," + AIMap.GetTileY(townlocation_a) +
-    " to " +
-    AIMap.GetTileX(townlocation_b) + "," + AIMap.GetTileY(townlocation_b)
-  );
-
-  /* Try to find a path. */
-  local path = false;
-  while (path == false) {
-    AILog.Info("Finding... ")
-    path = pathfinder.FindPath(100);
-    this.Sleep(1);
-  }
+  local path = findPathtoConnect(AITown.GetLocation(townsToConnect[0]), AITown.GetLocation(townsToConnect[1])) 
 
   if (path == null) {
-    /* No path was found. */
-    AILog.Error("pathfinder.FindPath return null");
+    AILog.Error("No path found");
   }
 
   /* If a path was found, build a road over it. */
