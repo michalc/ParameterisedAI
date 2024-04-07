@@ -16,22 +16,27 @@ function SupplyChainLabAI::Start()
       return name;
   }
 
+  local findTownsToConnect = function()
+  {
+    /* Get a list of all towns on the map. */
+    local townlist = AITownList();
+
+    /* Sort the list by population, highest population first. */
+    townlist.Valuate(AITown.GetPopulation);
+    townlist.Sort(AIList.SORT_BY_VALUE, false);
+
+    /* Pick the two towns with the highest population. */
+    local townid_a = townlist.Begin();
+    local townid_b = townlist.Next();
+
+    return [townid_a, townid_b];
+  }
+
   local name = setName();
   AILog.Info("Chosen company name: " + name);
 
-  /* Get a list of all towns on the map. */
-  local townlist = AITownList();
-
-  /* Sort the list by population, highest population first. */
-  townlist.Valuate(AITown.GetPopulation);
-  townlist.Sort(AIList.SORT_BY_VALUE, false);
-
-  /* Pick the two towns with the highest population. */
-  local townid_a = townlist.Begin();
-  local townid_b = townlist.Next();
-
-  /* Print the names of the towns we'll try to connect. */
-  AILog.Info("Going to connect " + AITown.GetName(townid_a) + " to " + AITown.GetName(townid_b));
+  local townsToConnect = findTownsToConnect();
+  AILog.Info("Going to connect " + AITown.GetName(townsToConnect[0]) + " to " + AITown.GetName(townsToConnect[1]));
 
   /* Tell OpenTTD we want to build normal road (no tram tracks). */
   AIRoad.SetCurrentRoadType(AIRoad.ROADTYPE_ROAD);
@@ -43,8 +48,8 @@ function SupplyChainLabAI::Start()
   pathfinder.cost.turn = 5000;
 
   /* Give the source and goal tiles to the pathfinder. */
-  local townlocation_a = AITown.GetLocation(townid_a);
-  local townlocation_b = AITown.GetLocation(townid_b);
+  local townlocation_a = AITown.GetLocation(townsToConnect[0]);
+  local townlocation_b = AITown.GetLocation(townsToConnect[1]);
   pathfinder.InitializePath([townlocation_a], [townlocation_b]);
 
   AILog.Info(
