@@ -102,6 +102,34 @@ function SupplyChainLabAI::Start()
     }
   }
 
+  local buildAlong = function(tiles, buildFunc) {
+    foreach (pathTileIndex in tiles) {
+      local adjacentTiles = AITileList();
+      adjacentTiles.AddTile(pathTileIndex - AIMap.GetTileIndex(1,0));
+      adjacentTiles.AddTile(pathTileIndex - AIMap.GetTileIndex(0,1));
+      adjacentTiles.AddTile(pathTileIndex - AIMap.GetTileIndex(-1,0));
+      adjacentTiles.AddTile(pathTileIndex - AIMap.GetTileIndex(0,-1));
+
+      foreach (index, value in adjacentTiles) {
+        local built = buildFunc(index, pathTileIndex);
+        if (built) {
+          if (!AIRoad.BuildRoad(index, pathTileIndex)) {
+          }
+          return;
+        }
+      }
+    }
+  }
+
+  local reverse = function(gen) {
+    local reversed = [];
+    foreach (item in gen) {
+      reversed.append(item);
+    }
+    reversed.reverse();
+    return reversed;
+  }
+
   local name = setName();
   AILog.Info("Chosen company name: " + name);
 
@@ -118,77 +146,21 @@ function SupplyChainLabAI::Start()
   buildRoad(getTilePairs(path));
   AILog.Info("Done");
 
-  // Build as close as possible to the start of the path
-  local built = false
-  foreach (pathTileIndex in getTiles(path)) {
-    local adjacentTiles = AITileList();
-    adjacentTiles.AddTile(pathTileIndex - AIMap.GetTileIndex(1,0));
-    adjacentTiles.AddTile(pathTileIndex - AIMap.GetTileIndex(0,1));
-    adjacentTiles.AddTile(pathTileIndex - AIMap.GetTileIndex(-1,0));
-    adjacentTiles.AddTile(pathTileIndex - AIMap.GetTileIndex(0,-1));
-
-    foreach (index, value in adjacentTiles) {
-      built = AIRoad.BuildRoadStation(index, pathTileIndex, AIRoad.ROADVEHTYPE_BUS, AIStation.STATION_NEW)
-      if (built) {
-        if (!AIRoad.BuildRoad(index, pathTileIndex)) {
-
-        }
-        break;
-      }
-    }
-    if (built) {
-      break;
-    }
+  // Build station as close as possible to the start of the path
+  local buildRoadStation = function(tile, front) {
+    return AIRoad.BuildRoadStation(tile, front, AIRoad.ROADVEHTYPE_BUS, AIStation.STATION_NEW)
   }
+  buildAlong(getTiles(path), buildRoadStation)
 
-  // Build as close as possible to the end of the path
-  local tiles = [];
-  foreach (pathTileIndex in getTiles(path)) {
-    tiles.append(pathTileIndex)
+  // Build station as close as possible to the end of the path
+  local reversedTiles = reverse(getTiles(path));
+  buildAlong(reversedTiles, buildRoadStation)
+
+  // Build depot as close as possible to the start of the path
+  local buildRoadDepot = function(tile, front) {
+    return AIRoad.BuildRoadDepot(tile, front);
   }
-  tiles.reverse();
-  built = false
-  foreach (pathTileIndex in tiles) {
-    local adjacentTiles = AITileList();
-    adjacentTiles.AddTile(pathTileIndex - AIMap.GetTileIndex(1,0));
-    adjacentTiles.AddTile(pathTileIndex - AIMap.GetTileIndex(0,1));
-    adjacentTiles.AddTile(pathTileIndex - AIMap.GetTileIndex(-1,0));
-    adjacentTiles.AddTile(pathTileIndex - AIMap.GetTileIndex(0,-1));
-
-    foreach (index, value in adjacentTiles) {
-      built = AIRoad.BuildRoadStation(index, pathTileIndex, AIRoad.ROADVEHTYPE_BUS, AIStation.STATION_NEW)
-      if (built) {
-        if (!AIRoad.BuildRoad(index, pathTileIndex)) {
-
-        }
-        break;
-      }
-    }
-    if (built) {
-      break;
-    }
-  }
-
-  // Build depot
-  built = false
-  foreach (pathTileIndex in tiles) {
-    local adjacentTiles = AITileList();
-    adjacentTiles.AddTile(pathTileIndex - AIMap.GetTileIndex(1,0));
-    adjacentTiles.AddTile(pathTileIndex - AIMap.GetTileIndex(0,1));
-    adjacentTiles.AddTile(pathTileIndex - AIMap.GetTileIndex(-1,0));
-    adjacentTiles.AddTile(pathTileIndex - AIMap.GetTileIndex(0,-1));
-    foreach (index, value in adjacentTiles) {
-      built = AIRoad.BuildRoadDepot(index, pathTileIndex)
-      if (built) {
-        if (!AIRoad.BuildRoad(index, pathTileIndex)) {
-        }
-        break;
-      }
-    }
-    if (built) {
-      break;
-    }
-  }
+  buildAlong(getTiles(path), buildRoadDepot)
 
   while (true) {
     while (AIEventController.IsEventWaiting()) {
