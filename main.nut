@@ -134,6 +134,9 @@ function SupplyChainLabAI::Start()
     foreach (index, value in adjacentTiles) {
       built = AIRoad.BuildRoadStation(index, pathTileIndex, AIRoad.ROADVEHTYPE_BUS, AIStation.STATION_NEW)
       if (built) {
+        if (!AIRoad.BuildRoad(index, pathTileIndex)) {
+
+        }
         break;
       }
     }
@@ -142,14 +145,33 @@ function SupplyChainLabAI::Start()
     }
   }
 
-  // // Build as close as possible to the start of the path
-  // sq_arrayreverse(tileList)
-  // foreach (index, value in tileList) {
-  //   AILog.Info("Tile reversed" + index);
-  // }
+  // Build as close as possible to the end of the path
+  local tiles = [];
+  foreach (pathTileIndex in getTiles(path)) {
+    tiles.append(pathTileIndex)
+  }
+  tiles.reverse();
+  built = false
+  foreach (pathTileIndex in tiles) {
+    local adjacentTiles = AITileList();
+    adjacentTiles.AddTile(pathTileIndex - AIMap.GetTileIndex(1,0));
+    adjacentTiles.AddTile(pathTileIndex - AIMap.GetTileIndex(0,1));
+    adjacentTiles.AddTile(pathTileIndex - AIMap.GetTileIndex(-1,0));
+    adjacentTiles.AddTile(pathTileIndex - AIMap.GetTileIndex(0,-1));
 
+    foreach (index, value in adjacentTiles) {
+      built = AIRoad.BuildRoadStation(index, pathTileIndex, AIRoad.ROADVEHTYPE_BUS, AIStation.STATION_NEW)
+      if (built) {
+        if (!AIRoad.BuildRoad(index, pathTileIndex)) {
 
-  // if (!AIRoad.BuildRoadStation(statile, stafront, stationtype, AIStation.STATION_NEW)) {
+        }
+        break;
+      }
+    }
+    if (built) {
+      break;
+    }
+  }
 
   while (true) {
     while (AIEventController.IsEventWaiting()) {
