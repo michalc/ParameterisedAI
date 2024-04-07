@@ -212,15 +212,11 @@ function SupplyChainLabAI::Start()
   }
 }
 
- function SupplyChainLabAI::Save()
- {
-   local table = {};  
-   //TODO: Add your save data to the table.
-   return table;
- }
- 
- function SupplyChainLabAI::Load(version, data)
- {
-   AILog.Info(" Loaded");
-   //TODO: Add your loading routines.
- }
+function SupplyChainLabAI::Save()
+{
+ return {};
+}
+
+function SupplyChainLabAI::Load(version, data)
+{
+}
