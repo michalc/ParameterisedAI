@@ -138,6 +138,17 @@ function SupplyChainLabAI::Start()
     }
   }
 
+  local chooseBusEngine = function(passengerCargo) {
+    local roadEngines = AIEngineList(AIVehicle.VT_ROAD);
+    roadEngines.Valuate(AIEngine.CanRefitCargo, passengerCargo);
+    roadEngines.KeepValue(1);
+    roadEngines.Valuate(AIEngine.IsBuildable);
+    roadEngines.KeepValue(1);
+    roadEngines.Valuate(AIEngine.GetMaxSpeed);
+    roadEngines.Sort(AIList.SORT_BY_VALUE, false);
+    return roadEngines.Begin();
+  }
+
   local name = setName();
   AILog.Info("Chosen company name: " + name);
 
@@ -171,21 +182,17 @@ function SupplyChainLabAI::Start()
   local depotTile = buildAlong(getTiles(path), buildRoadDepot)
 
   // Find bus type to build
-  local roadEngines = AIEngineList(AIVehicle.VT_ROAD);
-  roadEngines.Valuate(AIEngine.CanRefitCargo, getPassengerCargo());
-  roadEngines.KeepValue(1);
-  roadEngines.Valuate(AIEngine.IsBuildable);
-  roadEngines.KeepValue(1);
-  roadEngines.Valuate(AIEngine.GetMaxSpeed);
-  roadEngines.Sort(AIList.SORT_BY_VALUE, false);
-  local busEngine = roadEngines.Begin();
+  local busEngine = chooseBusEngine(getPassengerCargo());
   AILog.Info("Have chosen bus " + AIEngine.GetName(busEngine));
 
+  // Set the bus going between the stations
   local busVehicle = AIVehicle.BuildVehicle(depotTile, busEngine);
   AIOrder.AppendOrder(busVehicle, startStationTile, AIOrder.OF_NONE);
   AIOrder.AppendOrder(busVehicle, endStationTile, AIOrder.OF_NONE);
   AIVehicle.StartStopVehicle(busVehicle);
+  AILog.Info("Have started bus");
 
+  // Inifinite loop so the AI doesn't register as exited
   while (true) {
     AILog.Info("Sleeping");
     this.Sleep(50)
