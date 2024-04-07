@@ -173,6 +173,27 @@ function SupplyChainLabAI::Start()
     }
   }
 
+  // Build depot
+  built = false
+  foreach (pathTileIndex in tiles) {
+    local adjacentTiles = AITileList();
+    adjacentTiles.AddTile(pathTileIndex - AIMap.GetTileIndex(1,0));
+    adjacentTiles.AddTile(pathTileIndex - AIMap.GetTileIndex(0,1));
+    adjacentTiles.AddTile(pathTileIndex - AIMap.GetTileIndex(-1,0));
+    adjacentTiles.AddTile(pathTileIndex - AIMap.GetTileIndex(0,-1));
+    foreach (index, value in adjacentTiles) {
+      built = AIRoad.BuildRoadDepot(index, pathTileIndex)
+      if (built) {
+        if (!AIRoad.BuildRoad(index, pathTileIndex)) {
+        }
+        break;
+      }
+    }
+    if (built) {
+      break;
+    }
+  }
+
   while (true) {
     while (AIEventController.IsEventWaiting()) {
       local e = AIEventController.GetNextEvent();
