@@ -13,10 +13,11 @@ function SupplyChainLabAI::Start()
         name = "SupplyChainLabAI #" + ++i
       }
 
-      AILog.Info("Start of SupplyChainLabAI " + this.GetTick());
+      return name;
   }
 
-  setName();
+  local name = setName();
+  AILog.Info("Chosen company name: " + name);
 
   /* Get a list of all towns on the map. */
   local townlist = AITownList();
