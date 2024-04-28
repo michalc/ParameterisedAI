@@ -186,11 +186,14 @@ function SupplyChainLabAI::Start()
   AILog.Info("Have chosen bus " + AIEngine.GetName(busEngine));
 
   // Set the bus going between the stations
-  local busVehicle = AIVehicle.BuildVehicle(depotTile, busEngine);
-  AIOrder.AppendOrder(busVehicle, startStationTile, AIOrder.OF_NONE);
-  AIOrder.AppendOrder(busVehicle, endStationTile, AIOrder.OF_NONE);
-  AIVehicle.StartStopVehicle(busVehicle);
-  AILog.Info("Have started bus");
+  local maximum_buses = AIController.GetSetting("maximum_buses");
+  for (local i = 0 ; i < maximum_buses; i++) {
+    local busVehicle = AIVehicle.BuildVehicle(depotTile, busEngine);
+    AIOrder.AppendOrder(busVehicle, startStationTile, AIOrder.OF_NONE);
+    AIOrder.AppendOrder(busVehicle, endStationTile, AIOrder.OF_NONE);
+    AIVehicle.StartStopVehicle(busVehicle);
+    AILog.Info("Have started bus");
+  }
 
   // Inifinite loop so the AI doesn't register as exited
   while (true) {
