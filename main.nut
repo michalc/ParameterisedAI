@@ -1,16 +1,16 @@
 import("pathfinder.road", "RoadPathFinder", 4);
 
-class SupplyChainLabAI extends AIController 
+class ParameterisedAI extends AIController 
 {
 }
 
-function SupplyChainLabAI::Start()
+function ParameterisedAI::Start()
 {
   local setName = function() {
       local i = 1
-      local name = "SupplyChainLabAI"
+      local name = "ParameterisedAI"
       while (!AICompany.SetName(name)) {
-        name = "SupplyChainLabAI #" + ++i
+        name = "ParameterisedAI #" + ++i
       }
 
       return name;
@@ -202,11 +202,11 @@ function SupplyChainLabAI::Start()
   }
 }
 
-function SupplyChainLabAI::Save()
+function ParameterisedAI::Save()
 {
  return {};
 }
 
-function SupplyChainLabAI::Load(version, data)
+function ParameterisedAI::Load(version, data)
 {
 }

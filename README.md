@@ -1,9 +1,6 @@
-# SupplyChainLabAI
+# ParameterisedAI
 
-An OpenTTD AI to investigate properties of supply chains
-
-> [!IMPORTANT]
-> This is a work in progress, and this README serves as a rough design spec than actually documenting something that exists.
+A very basic OpenTTD AI, designed for exploring how its behaviour changes as parameters change, rather than as a competitor to play against.
 
 
 ## Usage
@@ -20,8 +17,8 @@ results = run_experiment(
     days=365 * 4 + 1,
     ais=(
         remote_file(
-            'https://github.com/michalc/SupplyChainLabAI/archive/76450b683be2d55c035e385cfc5581d961685ecb.tar.gz',
-            ai_name='SupplyChainLabAI',
+            'https://github.com/michalc/ParameterisedAI/archive/76450b683be2d55c035e385cfc5581d961685ecb.tar.gz',
+            ai_name='ParameterisedAI',
             ai_params=(),
         ),
     ),
