@@ -2,6 +2,8 @@
 
 A very basic OpenTTD AI, designed for exploring how its behaviour changes as parameters change, rather than as a competitor to play against.
 
+The AI currently make a single bus route, and the only parameter is the number of buses to attempt to build on that route.
+
 
 ## Usage
 
