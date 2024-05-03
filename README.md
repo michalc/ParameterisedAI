@@ -67,7 +67,7 @@ df = df.pivot(index='date', columns=('seed', 'max_buses'), values='money')
 df = df.T.groupby(level=1).mean().T
 ```
 
-And then to plot them
+And then to plot them:
 
 ```python
 import plotly.express as px
@@ -75,3 +75,8 @@ import plotly.express as px
 fig = px.line(df)
 fig.show()
 ```
+
+To show:
+
+![A plot of money against time for a range of buses](https://raw.githubusercontent.com/michalc/ParameterisedAI/main/example-results.svg)
+
